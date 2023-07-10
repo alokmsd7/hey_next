@@ -2,7 +2,7 @@ import connectMongoDB from "@/libs/mongodb";
 import Topics from "@/models/topics";
 import { NextApiResponse } from "next";
 
-export async function POST(request: NextApiRequest) {
+export async function POST(request: { json: () => PromiseLike<{ title: any; description: any; }> | { title: any; description: any; }; }) {
   const { title, description } = await request.json();
   await connectMongoDB();
   await Topics.create({ title, description });
@@ -15,8 +15,8 @@ export async function GET() {
   return NextApiResponse.json({ topics });
 }
 
-export async function DELETE(request: NextApiRequest) {
-  const id = request.query.id as string;
+export async function DELETE(request: { nextUrl: { searchParams: { get: (arg0: string) => any; }; }; }) {
+  const id = request.nextUrl.searchParams.get("id");
   await connectMongoDB();
   await Topics.findByIdAndDelete(id);
   return NextApiResponse.json({ message: "Topic deleted" }, { status: 200 });
